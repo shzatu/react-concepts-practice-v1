@@ -1,249 +1,196 @@
-import { useState, type FormEvent } from "react";
-
-type User = {
-  name: string;
-  age: number;
-  country: string;
-  city: string;
-};
-
-type FormData = {
-  name: string;
-  email: string;
-  age: number;
-  country: string;
-  isStudent: boolean;
-};
-
-const names = ["Shenu", "John", "Anna", "David", "Sophie"];
-
-const countries = [
-  "Sri Lanka",
-  "South Korea",
-  "China",
-  "Japan",
-  "USA",
-];
-
-const cities = [
-  "Colombo",
-  "Seoul",
-  "Shanghai",
-  "Tokyo",
-  "New York",
-];
-
-const initialUsers: User[] = [
-  {
-    name: "Shenu",
-    age: 20,
-    country: "Sri Lanka",
-    city: "Colombo",
-  },
-  {
-    name: "John",
-    age: 25,
-    country: "USA",
-    city: "New York",
-  },
-  {
-    name: "Anna",
-    age: 22,
-    country: "South Korea",
-    city: "Seoul",
-  },
-];
+import { useEffect, useRef, useState } from "react";
 
 function App() {
-  // ==================================================
-  // 1. NUMBER STATE
-  // ==================================================
+  // =====================================================
+  // 1. STOPWATCH
+  // =====================================================
+
+  const [seconds, setSeconds] = useState<number>(0);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [laps, setLaps] = useState<number[]>([]);
+
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (isRunning) {
+      intervalRef.current = window.setInterval(() => {
+        setSeconds((previousSeconds) => previousSeconds + 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (intervalRef.current !== null) {
+        window.clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isRunning]);
+
+  const handleReset = () => {
+    setIsRunning(false);
+    setSeconds(0);
+    setLaps([]);
+  };
+
+  const handleLap = () => {
+    setLaps((previousLaps) => [...previousLaps, seconds]);
+  };
+
+  const formatTime = (totalSeconds: number) => {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const remainingSeconds = totalSeconds % 60;
+
+    return `${String(hours).padStart(2, "0")}:${String(
+      minutes
+    ).padStart(2, "0")}:${String(
+      remainingSeconds
+    ).padStart(2, "0")}`;
+  };
+
+  // =====================================================
+  // 2. useState - NUMBER
+  // =====================================================
 
   const [count, setCount] = useState<number>(0);
 
-  // ==================================================
-  // 2. STRING STATE
-  // ==================================================
+  // =====================================================
+  // 3. useState - STRING
+  // =====================================================
+
+  const names = ["Shenu", "John", "Anna", "David"];
 
   const [nameIndex, setNameIndex] = useState<number>(0);
 
-  // ==================================================
-  // 3. BOOLEAN STATE
-  // ==================================================
+  // =====================================================
+  // 4. useState - BOOLEAN
+  // =====================================================
 
   const [isVisible, setIsVisible] = useState<boolean>(true);
 
-  // ==================================================
-  // 4. MULTIPLE STATE VARIABLES
-  // ==================================================
+  // =====================================================
+  // 5. useState - MULTIPLE STATE VARIABLES
+  // =====================================================
 
-  const [personName, setPersonName] = useState<string>("Shenu");
-  const [personAge, setPersonAge] = useState<number>(20);
-  const [isStudent, setIsStudent] = useState<boolean>(true);
+  const [personName, setPersonName] =
+    useState<string>("Shenu");
 
-  // ==================================================
-  // 5. OBJECT STATE
-  // ==================================================
+  const [personAge, setPersonAge] =
+    useState<number>(20);
 
-  const [user, setUser] = useState<User>({
+  const [isStudent, setIsStudent] =
+    useState<boolean>(true);
+
+  // =====================================================
+  // 6. useState - OBJECT
+  // =====================================================
+
+  const [person, setPerson] = useState({
     name: "Shenu",
     age: 20,
     country: "Sri Lanka",
-    city: "Colombo",
   });
 
-  const [userNameIndex, setUserNameIndex] = useState<number>(0);
-  const [countryIndex, setCountryIndex] = useState<number>(0);
+  // =====================================================
+  // 7. useState - ARRAY
+  // =====================================================
 
-  // ==================================================
-  // 6. ARRAY STATE
-  // ==================================================
+  const [items, setItems] = useState<string[]>([
+    "React",
+    "TypeScript",
+    "Vite",
+  ]);
 
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  // =====================================================
+  // 8. useEffect - NO DEPENDENCY ARRAY
+  // =====================================================
 
-  // ==================================================
-  // 7. FORM STATE
-  // ==================================================
+  const [renderCount, setRenderCount] =
+    useState<number>(0);
 
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    email: "",
-    age: 0,
-    country: "Sri Lanka",
-    isStudent: false,
+  useEffect(() => {
+    console.log("Effect without dependency array ran.");
   });
 
-  const [submitted, setSubmitted] = useState<boolean>(false);
+  // =====================================================
+  // 9. useEffect - EMPTY DEPENDENCY ARRAY
+  // =====================================================
 
-  // ==================================================
-  // HELPER FUNCTIONS
-  // ==================================================
+  useEffect(() => {
+    console.log("Effect with [] ran.");
+  }, []);
 
-  // Reset multiple state variables
-  const resetMultipleState = () => {
-    setPersonName("Shenu");
-    setPersonAge(20);
-    setIsStudent(true);
+  // =====================================================
+  // 10. useEffect - ONE DEPENDENCY
+  // =====================================================
+
+  useEffect(() => {
+    console.log("Count changed:", count);
+  }, [count]);
+
+  // =====================================================
+  // 11. useEffect - MULTIPLE DEPENDENCIES
+  // =====================================================
+
+  useEffect(() => {
+    console.log(
+      "Count or name changed:",
+      count,
+      names[nameIndex]
+    );
+  }, [count, nameIndex]);
+
+  // =====================================================
+  // 12. useRef - REMEMBER A VALUE
+  // =====================================================
+
+  const clickCountRef = useRef<number>(0);
+
+  const handleRefClick = () => {
+    clickCountRef.current += 1;
+
+    console.log("useRef value:", clickCountRef.current);
   };
 
-  // Change object name
-  const changeObjectName = (direction: number) => {
-    const newIndex =
-      (userNameIndex + direction + names.length) % names.length;
+  const resetRef = () => {
+    clickCountRef.current = 0;
 
-    setUserNameIndex(newIndex);
-
-    setUser({
-      ...user,
-      name: names[newIndex],
-    });
+    console.log("useRef reset:", clickCountRef.current);
   };
 
-  // Change object country and city
-  const changeCountry = (direction: number) => {
-    const newIndex =
-      (countryIndex + direction + countries.length) %
-      countries.length;
+  // =====================================================
+  // 13. useRef - ACCESS INPUT
+  // =====================================================
 
-    setCountryIndex(newIndex);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    setUser({
-      ...user,
-      country: countries[newIndex],
-      city: cities[newIndex],
-    });
+  const focusInput = () => {
+    inputRef.current?.focus();
   };
 
-  // Increase object age
-  const increaseObjectAge = () => {
-    setUser({
-      ...user,
-      age: user.age + 1,
-    });
-  };
-
-  // Decrease object age
-  const decreaseObjectAge = () => {
-    if (user.age > 0) {
-      setUser({
-        ...user,
-        age: user.age - 1,
-      });
+  const clearInput = () => {
+    if (inputRef.current) {
+      inputRef.current.value = "";
+      inputRef.current.focus();
     }
   };
 
-  // Reset object
-  const resetObject = () => {
-    setUser({
-      name: "Shenu",
-      age: 20,
-      country: "Sri Lanka",
-      city: "Colombo",
-    });
+  // =====================================================
+  // 14. useRef - PREVIOUS VALUE
+  // =====================================================
 
-    setUserNameIndex(0);
-    setCountryIndex(0);
-  };
+  const [currentName, setCurrentName] =
+    useState<string>("Shenu");
 
-  // Add a new user to the array
-  const addUser = () => {
-    const newUser: User = {
-      name: `User ${users.length + 1}`,
-      age: 18 + users.length,
-      country: countries[users.length % countries.length],
-      city: cities[users.length % cities.length],
-    };
+  const previousNameRef = useRef<string>("");
 
-    setUsers([...users, newUser]);
-  };
+  useEffect(() => {
+    previousNameRef.current = currentName;
+  }, [currentName]);
 
-  // Remove the last user
-  const removeLastUser = () => {
-    if (users.length > 0) {
-      setUsers(users.slice(0, -1));
-    }
-  };
-
-  // Reset users
-  const resetUsers = () => {
-    setUsers(initialUsers);
-  };
-
-  // ==================================================
-  // FORM FUNCTIONS
-  // ==================================================
-
-  // Update form fields
-  const handleInputChange = (
-    field: keyof FormData,
-    value: string | number | boolean
-  ) => {
-    setFormData({
-      ...formData,
-      [field]: value,
-    });
-
-    setSubmitted(false);
-  };
-
-  // Submit form
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setSubmitted(true);
-  };
-
-  // Reset form
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      email: "",
-      age: 0,
-      country: "Sri Lanka",
-      isStudent: false,
-    });
-
-    setSubmitted(false);
-  };
+  // =====================================================
+  // PAGE
+  // =====================================================
 
   return (
     <div
@@ -252,35 +199,114 @@ function App() {
         margin: "0 auto",
         padding: "30px",
         fontFamily: "Arial, sans-serif",
+        lineHeight: "1.5",
       }}
     >
-      <h1>React useState Examples</h1>
+      <h1>React Concepts Practice</h1>
+
+      {/* =================================================
+          STOPWATCH
+      ================================================= */}
+
+      <section
+        style={{
+          border: "1px solid #ddd",
+          borderRadius: "12px",
+          padding: "30px",
+          textAlign: "center",
+          marginBottom: "30px",
+        }}
+      >
+        <h2>Simple Stopwatch</h2>
+
+        <div
+          style={{
+            fontSize: "48px",
+            fontWeight: "bold",
+            margin: "20px 0",
+            letterSpacing: "3px",
+          }}
+        >
+          {formatTime(seconds)}
+        </div>
+
+        <p>
+          Status:{" "}
+          <strong>
+            {isRunning ? "Running" : "Stopped"}
+          </strong>
+        </p>
+
+        <button
+          onClick={() => setIsRunning(true)}
+          disabled={isRunning}
+        >
+          Start
+        </button>
+
+        <button
+          onClick={() => setIsRunning(false)}
+          disabled={!isRunning}
+        >
+          Stop
+        </button>
+
+        <button
+          onClick={handleLap}
+          disabled={seconds === 0}
+        >
+          Lap
+        </button>
+
+        <button onClick={handleReset}>Reset</button>
+
+        {laps.length > 0 && (
+          <div style={{ marginTop: "25px" }}>
+            <h3>Lap History</h3>
+
+            {laps.map((lapTime, index) => (
+              <p key={index}>
+                Lap {index + 1}:{" "}
+                <strong>{formatTime(lapTime)}</strong>
+              </p>
+            ))}
+          </div>
+        )}
+      </section>
 
       <hr />
 
-      {/* ==================================================
-          1. NUMBER STATE
-      ================================================== */}
+      {/* =================================================
+          useState
+      ================================================= */}
+
+      <h1>useState Examples</h1>
+
+      {/* NUMBER */}
 
       <section>
-        <h2>1. Number State</h2>
+        <h2>2. Number State</h2>
 
-        <h3>Current Count: {count}</h3>
+        <h3>Count: {count}</h3>
 
-        <button onClick={() => setCount((prev) => prev + 1)}>
+        <button
+          onClick={() =>
+            setCount(
+              (previousCount) => previousCount + 1
+            )
+          }
+        >
           +1
         </button>
 
-        <button onClick={() => setCount((prev) => prev + 5)}>
-          +5
-        </button>
-
-        <button onClick={() => setCount((prev) => prev - 1)}>
+        <button
+          onClick={() =>
+            setCount(
+              (previousCount) => previousCount - 1
+            )
+          }
+        >
           -1
-        </button>
-
-        <button onClick={() => setCount((prev) => prev - 5)}>
-          -5
         </button>
 
         <button onClick={() => setCount(0)}>
@@ -290,23 +316,18 @@ function App() {
 
       <hr />
 
-      {/* ==================================================
-          2. STRING STATE
-      ================================================== */}
+      {/* STRING */}
 
       <section>
-        <h2>2. String State</h2>
+        <h2>3. String State</h2>
 
         <h3>Hello, {names[nameIndex]}!</h3>
-
-        <p>
-          Current name: <strong>{names[nameIndex]}</strong>
-        </p>
 
         <button
           onClick={() =>
             setNameIndex(
-              (nameIndex + 1) % names.length
+              (previousIndex) =>
+                (previousIndex + 1) % names.length
             )
           }
         >
@@ -316,7 +337,10 @@ function App() {
         <button
           onClick={() =>
             setNameIndex(
-              (nameIndex - 1 + names.length) %
+              (previousIndex) =>
+                (previousIndex -
+                  1 +
+                  names.length) %
                 names.length
             )
           }
@@ -325,23 +349,19 @@ function App() {
         </button>
 
         <button onClick={() => setNameIndex(0)}>
-          Reset Name
+          Reset
         </button>
       </section>
 
       <hr />
 
-      {/* ==================================================
-          3. BOOLEAN STATE
-      ================================================== */}
+      {/* BOOLEAN */}
 
       <section>
-        <h2>3. Boolean State</h2>
+        <h2>4. Boolean State</h2>
 
         {isVisible && (
-          <h3>
-            Hello! This content is currently visible.
-          </h3>
+          <p>This content is currently visible.</p>
         )}
 
         <p>
@@ -352,32 +372,40 @@ function App() {
         </p>
 
         <button
-          onClick={() => setIsVisible(!isVisible)}
+          onClick={() =>
+            setIsVisible(
+              (previousValue) => !previousValue
+            )
+          }
         >
           Toggle
         </button>
 
-        <button onClick={() => setIsVisible(true)}>
+        <button
+          onClick={() => setIsVisible(true)}
+        >
           Show
         </button>
 
-        <button onClick={() => setIsVisible(false)}>
+        <button
+          onClick={() => setIsVisible(false)}
+        >
           Hide
         </button>
 
-        <button onClick={() => setIsVisible(true)}>
+        <button
+          onClick={() => setIsVisible(true)}
+        >
           Reset
         </button>
       </section>
 
       <hr />
 
-      {/* ==================================================
-          4. MULTIPLE STATE VARIABLES
-      ================================================== */}
+      {/* MULTIPLE STATE */}
 
       <section>
-        <h2>4. Multiple State Variables</h2>
+        <h2>5. Multiple State Variables</h2>
 
         <p>
           Name: <strong>{personName}</strong>
@@ -407,14 +435,10 @@ function App() {
         </button>
 
         <button
-          onClick={() => setPersonName("Shenu")}
-        >
-          Name → Shenu
-        </button>
-
-        <button
           onClick={() =>
-            setPersonAge((prev) => prev + 1)
+            setPersonAge(
+              (previousAge) => previousAge + 1
+            )
           }
         >
           Age +1
@@ -422,283 +446,363 @@ function App() {
 
         <button
           onClick={() =>
-            setPersonAge((prev) => prev - 1)
+            setIsStudent(
+              (previousValue) => !previousValue
+            )
           }
         >
-          Age -1
+          Toggle Student
         </button>
 
         <button
-          onClick={() => setIsStudent(!isStudent)}
+          onClick={() => {
+            setPersonName("Shenu");
+            setPersonAge(20);
+            setIsStudent(true);
+          }}
         >
-          Toggle Student Status
-        </button>
-
-        <button onClick={resetMultipleState}>
-          Reset All
+          Reset
         </button>
       </section>
 
       <hr />
 
-      {/* ==================================================
-          5. OBJECT STATE
-      ================================================== */}
+      {/* OBJECT */}
 
       <section>
-        <h2>5. Object with Multiple Data</h2>
+        <h2>6. Object State</h2>
 
         <p>
-          Name: <strong>{user.name}</strong>
+          Name: <strong>{person.name}</strong>
         </p>
 
         <p>
-          Age: <strong>{user.age}</strong>
+          Age: <strong>{person.age}</strong>
         </p>
 
         <p>
-          Country: <strong>{user.country}</strong>
+          Country:{" "}
+          <strong>{person.country}</strong>
         </p>
 
-        <p>
-          City: <strong>{user.city}</strong>
-        </p>
-
-        <h3>Change Name</h3>
-
-        <button onClick={() => changeObjectName(1)}>
-          Next Name
+        <button
+          onClick={() =>
+            setPerson({
+              ...person,
+              name: "Anna",
+            })
+          }
+        >
+          Change Name
         </button>
 
-        <button onClick={() => changeObjectName(-1)}>
-          Previous Name
-        </button>
-
-        <h3>Change Country</h3>
-
-        <button onClick={() => changeCountry(1)}>
-          Next Country
-        </button>
-
-        <button onClick={() => changeCountry(-1)}>
-          Previous Country
-        </button>
-
-        <h3>Modify Age</h3>
-
-        <button onClick={increaseObjectAge}>
+        <button
+          onClick={() =>
+            setPerson({
+              ...person,
+              age: person.age + 1,
+            })
+          }
+        >
           Age +1
         </button>
 
-        <button onClick={decreaseObjectAge}>
-          Age -1
+        <button
+          onClick={() =>
+            setPerson({
+              ...person,
+              country: "South Korea",
+            })
+          }
+        >
+          Change Country
         </button>
 
-        <button onClick={resetObject}>
-          Reset Object
+        <button
+          onClick={() =>
+            setPerson({
+              name: "Shenu",
+              age: 20,
+              country: "Sri Lanka",
+            })
+          }
+        >
+          Reset
         </button>
       </section>
 
       <hr />
 
-      {/* ==================================================
-          6. ARRAY STATE
-      ================================================== */}
+      {/* ARRAY */}
 
       <section>
-        <h2>6. Array of Multiple Users</h2>
+        <h2>7. Array State</h2>
 
         <p>
-          Total users: <strong>{users.length}</strong>
+          Total items:{" "}
+          <strong>{items.length}</strong>
         </p>
 
-        {users.map((user) => (
-          <div key={user.name}>
-            <p>
-              <strong>{user.name}</strong>
-              {" — "}
-              Age: {user.age}
-              {" — "}
-              Country: {user.country}
-              {" — "}
-              City: {user.city}
-            </p>
-          </div>
-        ))}
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
 
-        <button onClick={addUser}>
-          Add User
+        <button
+          onClick={() =>
+            setItems([
+              ...items,
+              `Item ${items.length + 1}`,
+            ])
+          }
+        >
+          Add Item
         </button>
 
-        <button onClick={removeLastUser}>
-          Remove Last User
+        <button
+          onClick={() =>
+            setItems(items.slice(0, -1))
+          }
+          disabled={items.length === 0}
+        >
+          Remove Last
         </button>
 
-        <button onClick={resetUsers}>
-          Reset Users
+        <button
+          onClick={() =>
+            setItems([
+              "React",
+              "TypeScript",
+              "Vite",
+            ])
+          }
+        >
+          Reset
         </button>
       </section>
 
       <hr />
 
-      {/* ==================================================
-          7. SMALL FORM
-      ================================================== */}
+      {/* =================================================
+          useEffect
+      ================================================= */}
+
+      <h1>useEffect Examples</h1>
+
+      {/* NO DEPENDENCY */}
 
       <section>
-        <h2>7. Small User Form</h2>
+        <h2>8. No Dependency Array</h2>
 
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>Name: </label>
+        <button
+          onClick={() =>
+            setRenderCount(
+              (previousCount) =>
+                previousCount + 1
+            )
+          }
+        >
+          Cause Render
+        </button>
 
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(event) =>
-                handleInputChange(
-                  "name",
-                  event.target.value
-                )
-              }
-              placeholder="Enter your name"
-            />
-          </div>
+        <button
+          onClick={() => setRenderCount(0)}
+        >
+          Reset
+        </button>
 
-          <br />
-
-          <div>
-            <label>Email: </label>
-
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(event) =>
-                handleInputChange(
-                  "email",
-                  event.target.value
-                )
-              }
-              placeholder="Enter your email"
-            />
-          </div>
-
-          <br />
-
-          <div>
-            <label>Age: </label>
-
-            <input
-              type="number"
-              value={formData.age}
-              onChange={(event) =>
-                handleInputChange(
-                  "age",
-                  Number(event.target.value)
-                )
-              }
-            />
-          </div>
-
-          <br />
-
-          <div>
-            <label>Country: </label>
-
-            <select
-              value={formData.country}
-              onChange={(event) =>
-                handleInputChange(
-                  "country",
-                  event.target.value
-                )
-              }
-            >
-              <option value="Sri Lanka">
-                Sri Lanka
-              </option>
-
-              <option value="South Korea">
-                South Korea
-              </option>
-
-              <option value="China">
-                China
-              </option>
-
-              <option value="Japan">
-                Japan
-              </option>
-
-              <option value="USA">
-                USA
-              </option>
-            </select>
-          </div>
-
-          <br />
-
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={formData.isStudent}
-                onChange={(event) =>
-                  handleInputChange(
-                    "isStudent",
-                    event.target.checked
-                  )
-                }
-              />
-
-              {" "}Student
-            </label>
-          </div>
-
-          <br />
-
-          <button type="submit">
-            Submit
-          </button>
-
-          <button
-            type="button"
-            onClick={resetForm}
-          >
-            Reset
-          </button>
-        </form>
-
-        {/* Submitted data */}
-        {submitted && (
-          <div>
-            <h3>Submitted Information</h3>
-
-            <p>
-              Name: {formData.name}
-            </p>
-
-            <p>
-              Email: {formData.email}
-            </p>
-
-            <p>
-              Age: {formData.age}
-            </p>
-
-            <p>
-              Country: {formData.country}
-            </p>
-
-            <p>
-              Student:{" "}
-              {formData.isStudent ? "Yes" : "No"}
-            </p>
-          </div>
-        )}
+        <p>
+          Render button clicked:{" "}
+          <strong>{renderCount}</strong>
+        </p>
       </section>
 
       <hr />
+
+      {/* EMPTY DEPENDENCY */}
+
+      <section>
+        <h2>9. Empty Dependency Array []</h2>
+
+        <p>Check the browser console.</p>
+      </section>
+
+      <hr />
+
+      {/* ONE DEPENDENCY */}
+
+      <section>
+        <h2>10. Dependency [count]</h2>
+
+        <p>
+          Current count:{" "}
+          <strong>{count}</strong>
+        </p>
+
+        <button
+          onClick={() =>
+            setCount(
+              (previousCount) =>
+                previousCount + 1
+            )
+          }
+        >
+          Change Count
+        </button>
+
+        <button onClick={() => setCount(0)}>
+          Reset Count
+        </button>
+      </section>
+
+      <hr />
+
+      {/* MULTIPLE DEPENDENCIES */}
+
+      <section>
+        <h2>11. Multiple Dependencies</h2>
+
+        <p>
+          Count: <strong>{count}</strong>
+        </p>
+
+        <p>
+          Name:{" "}
+          <strong>{names[nameIndex]}</strong>
+        </p>
+
+        <button
+          onClick={() =>
+            setCount(
+              (previousCount) =>
+                previousCount + 1
+            )
+          }
+        >
+          Change Count
+        </button>
+
+        <button
+          onClick={() =>
+            setNameIndex(
+              (previousIndex) =>
+                (previousIndex + 1) % names.length
+            )
+          }
+        >
+          Change Name
+        </button>
+
+        <button
+          onClick={() => {
+            setCount(0);
+            setNameIndex(0);
+          }}
+        >
+          Reset Both
+        </button>
+      </section>
+
+      <hr />
+
+      {/* =================================================
+          useRef
+      ================================================= */}
+
+      <h1>useRef Examples</h1>
+
+      {/* REMEMBER VALUE */}
+
+      <section>
+        <h2>12. useRef — Remember a Value</h2>
+
+        <button onClick={handleRefClick}>
+          Change Ref Value
+        </button>
+
+        <button onClick={resetRef}>
+          Reset Ref
+        </button>
+
+        <p>Check the browser console.</p>
+      </section>
+
+      <hr />
+
+      {/* INPUT REF */}
+
+      <section>
+        <h2>13. useRef — Access an Input</h2>
+
+        <input
+          ref={inputRef}
+          placeholder="Type something..."
+        />
+
+        <button onClick={focusInput}>
+          Focus Input
+        </button>
+
+        <button onClick={clearInput}>
+          Clear Input
+        </button>
+      </section>
+
+      <hr />
+
+      {/* PREVIOUS VALUE */}
+
+      <section>
+        <h2>14. useRef — Previous Value</h2>
+
+        <p>
+          Current name:{" "}
+          <strong>{currentName}</strong>
+        </p>
+
+        <p>
+          Previous name:{" "}
+          <strong>
+            {previousNameRef.current ||
+              "None yet"}
+          </strong>
+        </p>
+
+        <button
+          onClick={() => setCurrentName("Shenu")}
+        >
+          Shenu
+        </button>
+
+        <button
+          onClick={() => setCurrentName("Anna")}
+        >
+          Anna
+        </button>
+
+        <button
+          onClick={() => setCurrentName("John")}
+        >
+          John
+        </button>
+
+        <button
+          onClick={() => setCurrentName("David")}
+        >
+          David
+        </button>
+
+        <button
+          onClick={() => setCurrentName("Shenu")}
+        >
+          Reset
+        </button>
+      </section>
+
+      <hr />
+
+      <h2>React Concepts Practice Complete</h2>
     </div>
   );
 }
