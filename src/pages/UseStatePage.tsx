@@ -1,63 +1,18 @@
 import { useState } from "react";
 
-type User = {
-  name: string;
-  age: number;
-  country: string;
-};
-
-const names = [
-  "Shenu",
-  "John",
-  "Anna",
-  "David",
-  "Sophie",
-];
-
-const countries = [
-  "Sri Lanka",
-  "South Korea",
-  "China",
-  "Japan",
-  "USA",
-];
-
-const cities = [
-  "Colombo",
-  "Seoul",
-  "Shanghai",
-  "Tokyo",
-  "New York",
-];
-
-const initialUsers: User[] = [
-  {
-    name: "Shenu",
-    age: 20,
-    country: "Sri Lanka",
-  },
-  {
-    name: "John",
-    age: 25,
-    country: "USA",
-  },
-  {
-    name: "Anna",
-    age: 22,
-    country: "South Korea",
-  },
-];
-
 function UseStatePage() {
-  const [count, setCount] =
-    useState<number>(0);
+  // 1. NUMBER STATE
+  const [count, setCount] = useState<number>(0);
 
-  const [nameIndex, setNameIndex] =
-    useState<number>(0);
+  // 2. STRING STATE
+  const names = ["Shenu", "John", "Anna", "David"];
 
-  const [isVisible, setIsVisible] =
-    useState<boolean>(true);
+  const [nameIndex, setNameIndex] = useState<number>(0);
 
+  // 3. BOOLEAN STATE
+  const [isVisible, setIsVisible] = useState<boolean>(true);
+
+  // 4. MULTIPLE STATE VARIABLES
   const [personName, setPersonName] =
     useState<string>("Shenu");
 
@@ -67,111 +22,19 @@ function UseStatePage() {
   const [isStudent, setIsStudent] =
     useState<boolean>(true);
 
-  const [user, setUser] =
-    useState<User>({
-      name: "Shenu",
-      age: 20,
-      country: "Sri Lanka",
-    });
+  // 5. OBJECT STATE
+  const [person, setPerson] = useState({
+    name: "Shenu",
+    age: 20,
+    country: "Sri Lanka",
+  });
 
-  const [userNameIndex, setUserNameIndex] =
-    useState<number>(0);
-
-  const [countryIndex, setCountryIndex] =
-    useState<number>(0);
-
-  const [users, setUsers] =
-    useState<User[]>(initialUsers);
-
-  const resetMultipleState = () => {
-    setPersonName("Shenu");
-    setPersonAge(20);
-    setIsStudent(true);
-  };
-
-  const changeObjectName = (
-    direction: number
-  ) => {
-    const newIndex =
-      (userNameIndex +
-        direction +
-        names.length) %
-      names.length;
-
-    setUserNameIndex(newIndex);
-
-    setUser({
-      ...user,
-      name: names[newIndex],
-    });
-  };
-
-  const changeCountry = (
-    direction: number
-  ) => {
-    const newIndex =
-      (countryIndex +
-        direction +
-        countries.length) %
-      countries.length;
-
-    setCountryIndex(newIndex);
-
-    setUser({
-      ...user,
-      country: countries[newIndex],
-    });
-  };
-
-  const increaseObjectAge = () => {
-    setUser({
-      ...user,
-      age: user.age + 1,
-    });
-  };
-
-  const decreaseObjectAge = () => {
-    if (user.age > 0) {
-      setUser({
-        ...user,
-        age: user.age - 1,
-      });
-    }
-  };
-
-  const resetObject = () => {
-    setUser({
-      name: "Shenu",
-      age: 20,
-      country: "Sri Lanka",
-    });
-
-    setUserNameIndex(0);
-    setCountryIndex(0);
-  };
-
-  const addUser = () => {
-    const newUser: User = {
-      name: `User ${users.length + 1}`,
-      age: 18 + users.length,
-      country:
-        countries[
-          users.length % countries.length
-        ],
-    };
-
-    setUsers([...users, newUser]);
-  };
-
-  const removeLastUser = () => {
-    if (users.length > 0) {
-      setUsers(users.slice(0, -1));
-    }
-  };
-
-  const resetUsers = () => {
-    setUsers(initialUsers);
-  };
+  // 6. ARRAY STATE
+  const [items, setItems] = useState<string[]>([
+    "React",
+    "TypeScript",
+    "Vite",
+  ]);
 
   return (
     <div
@@ -180,20 +43,22 @@ function UseStatePage() {
         margin: "0 auto",
         padding: "30px",
         fontFamily: "Arial, sans-serif",
+        lineHeight: "1.5",
       }}
     >
-      <h1>React useState Examples</h1>
+      <h1>useState Examples</h1>
 
-      <hr />
-
+      {/* 1. NUMBER STATE */}
       <section>
         <h2>1. Number State</h2>
 
-        <h3>Current Count: {count}</h3>
+        <h3>Count: {count}</h3>
 
         <button
           onClick={() =>
-            setCount(count + 1)
+            setCount(
+              (previousCount) => previousCount + 1
+            )
           }
         >
           +1
@@ -201,58 +66,37 @@ function UseStatePage() {
 
         <button
           onClick={() =>
-            setCount(count + 5)
-          }
-        >
-          +5
-        </button>
-
-        <button
-          onClick={() =>
-            setCount(count - 1)
+            setCount(
+              (previousCount) => previousCount - 1
+            )
           }
         >
           -1
         </button>
 
-        <button
-          onClick={() =>
-            setCount(count - 5)
-          }
-        >
-          -5
-        </button>
-
-        <button
-          onClick={() =>
-            setCount(0)
-          }
-        >
+        <button onClick={() => setCount(0)}>
           Reset
         </button>
       </section>
 
       <hr />
 
+      {/* 2. STRING STATE */}
       <section>
         <h2>2. String State</h2>
 
-        <h3>
-          Hello, {names[nameIndex]}!
-        </h3>
+        <h3>Hello, {names[nameIndex]}!</h3>
 
         <p>
           Current name:{" "}
-          <strong>
-            {names[nameIndex]}
-          </strong>
+          <strong>{names[nameIndex]}</strong>
         </p>
 
         <button
           onClick={() =>
             setNameIndex(
-              (nameIndex + 1) %
-                names.length
+              (previousIndex) =>
+                (previousIndex + 1) % names.length
             )
           }
         >
@@ -262,9 +106,10 @@ function UseStatePage() {
         <button
           onClick={() =>
             setNameIndex(
-              (nameIndex -
-                1 +
-                names.length) %
+              (previousIndex) =>
+                (previousIndex -
+                  1 +
+                  names.length) %
                 names.length
             )
           }
@@ -272,64 +117,52 @@ function UseStatePage() {
           Previous Name
         </button>
 
-        <button
-          onClick={() =>
-            setNameIndex(0)
-          }
-        >
-          Reset Name
+        <button onClick={() => setNameIndex(0)}>
+          Reset
         </button>
       </section>
 
       <hr />
 
+      {/* 3. BOOLEAN STATE */}
       <section>
         <h2>3. Boolean State</h2>
 
         {isVisible && (
-          <h3>
-            Hello! This content is currently
-            visible.
-          </h3>
+          <p>This content is currently visible.</p>
         )}
 
         <p>
           Status:{" "}
           <strong>
-            {isVisible
-              ? "Visible"
-              : "Hidden"}
+            {isVisible ? "Visible" : "Hidden"}
           </strong>
         </p>
 
         <button
           onClick={() =>
-            setIsVisible(!isVisible)
+            setIsVisible(
+              (previousValue) => !previousValue
+            )
           }
         >
           Toggle
         </button>
 
         <button
-          onClick={() =>
-            setIsVisible(true)
-          }
+          onClick={() => setIsVisible(true)}
         >
           Show
         </button>
 
         <button
-          onClick={() =>
-            setIsVisible(false)
-          }
+          onClick={() => setIsVisible(false)}
         >
           Hide
         </button>
 
         <button
-          onClick={() =>
-            setIsVisible(true)
-          }
+          onClick={() => setIsVisible(true)}
         >
           Reset
         </button>
@@ -337,19 +170,16 @@ function UseStatePage() {
 
       <hr />
 
+      {/* 4. MULTIPLE STATE VARIABLES */}
       <section>
-        <h2>
-          4. Multiple State Variables
-        </h2>
+        <h2>4. Multiple State Variables</h2>
 
         <p>
-          Name:{" "}
-          <strong>{personName}</strong>
+          Name: <strong>{personName}</strong>
         </p>
 
         <p>
-          Age:{" "}
-          <strong>{personAge}</strong>
+          Age: <strong>{personAge}</strong>
         </p>
 
         <p>
@@ -360,33 +190,21 @@ function UseStatePage() {
         </p>
 
         <button
-          onClick={() =>
-            setPersonName("John")
-          }
+          onClick={() => setPersonName("John")}
         >
           Name → John
         </button>
 
         <button
-          onClick={() =>
-            setPersonName("Anna")
-          }
+          onClick={() => setPersonName("Anna")}
         >
           Name → Anna
         </button>
 
         <button
           onClick={() =>
-            setPersonName("Shenu")
-          }
-        >
-          Name → Shenu
-        </button>
-
-        <button
-          onClick={() =>
             setPersonAge(
-              personAge + 1
+              (previousAge) => previousAge + 1
             )
           }
         >
@@ -396,7 +214,7 @@ function UseStatePage() {
         <button
           onClick={() =>
             setPersonAge(
-              personAge - 1
+              (previousAge) => previousAge - 1
             )
           }
         >
@@ -405,147 +223,137 @@ function UseStatePage() {
 
         <button
           onClick={() =>
-            setIsStudent(!isStudent)
+            setIsStudent(
+              (previousValue) => !previousValue
+            )
           }
         >
-          Toggle Student Status
+          Toggle Student
         </button>
 
         <button
-          onClick={resetMultipleState}
+          onClick={() => {
+            setPersonName("Shenu");
+            setPersonAge(20);
+            setIsStudent(true);
+          }}
         >
-          Reset All
+          Reset
         </button>
       </section>
 
       <hr />
 
+      {/* 5. OBJECT STATE */}
       <section>
-        <h2>
-          5. Object with Multiple Data
-        </h2>
+        <h2>5. Object State</h2>
 
         <p>
-          Name:{" "}
-          <strong>{user.name}</strong>
+          Name: <strong>{person.name}</strong>
         </p>
 
         <p>
-          Age:{" "}
-          <strong>{user.age}</strong>
+          Age: <strong>{person.age}</strong>
         </p>
 
         <p>
           Country:{" "}
-          <strong>{user.country}</strong>
+          <strong>{person.country}</strong>
         </p>
 
-        <p>
-          City:{" "}
-          <strong>
-            {cities[countryIndex]}
-          </strong>
-        </p>
-
-        <h3>Change Name</h3>
-
         <button
           onClick={() =>
-            changeObjectName(1)
+            setPerson({
+              ...person,
+              name: "Anna",
+            })
           }
         >
-          Next Name
+          Change Name
         </button>
 
         <button
           onClick={() =>
-            changeObjectName(-1)
+            setPerson({
+              ...person,
+              age: person.age + 1,
+            })
           }
-        >
-          Previous Name
-        </button>
-
-        <h3>Change Country</h3>
-
-        <button
-          onClick={() =>
-            changeCountry(1)
-          }
-        >
-          Next Country
-        </button>
-
-        <button
-          onClick={() =>
-            changeCountry(-1)
-          }
-        >
-          Previous Country
-        </button>
-
-        <h3>Modify Age</h3>
-
-        <button
-          onClick={increaseObjectAge}
         >
           Age +1
         </button>
 
         <button
-          onClick={decreaseObjectAge}
+          onClick={() =>
+            setPerson({
+              ...person,
+              country: "South Korea",
+            })
+          }
         >
-          Age -1
+          Change Country
         </button>
 
         <button
-          onClick={resetObject}
+          onClick={() =>
+            setPerson({
+              name: "Shenu",
+              age: 20,
+              country: "Sri Lanka",
+            })
+          }
         >
-          Reset Object
+          Reset
         </button>
       </section>
 
       <hr />
 
+      {/* 6. ARRAY STATE */}
       <section>
-        <h2>
-          6. Array of Multiple Users
-        </h2>
+        <h2>6. Array State</h2>
 
         <p>
-          Total users:{" "}
-          <strong>{users.length}</strong>
+          Total items:{" "}
+          <strong>{items.length}</strong>
         </p>
 
-        {users.map(
-          (user, index) => (
-            <div key={index}>
-              <p>
-                <strong>
-                  {index + 1}.{" "}
-                  {user.name}
-                </strong>
-                {" — "}
-                Age: {user.age}
-                {" — "}
-                Country:{" "}
-                {user.country}
-              </p>
-            </div>
-          )
-        )}
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
 
-        <button onClick={addUser}>
-          Add User
+        <button
+          onClick={() =>
+            setItems([
+              ...items,
+              `Item ${items.length + 1}`,
+            ])
+          }
+        >
+          Add Item
         </button>
 
         <button
-          onClick={removeLastUser}
+          onClick={() =>
+            setItems(items.slice(0, -1))
+          }
+          disabled={items.length === 0}
         >
-          Remove Last User
+          Remove Last
         </button>
 
-        <button onClick={resetUsers}>
-          Reset Users
+        <button
+          onClick={() =>
+            setItems([
+              "React",
+              "TypeScript",
+              "Vite",
+            ])
+          }
+        >
+          Reset
         </button>
       </section>
     </div>

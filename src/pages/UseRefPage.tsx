@@ -1,29 +1,56 @@
 import {
+  useEffect,
   useRef,
   useState,
 } from "react";
 
 function UseRefPage() {
+  // 1. REMEMBER A VALUE
+  const clickCountRef = useRef<number>(0);
+
+  const handleRefClick = () => {
+    clickCountRef.current += 1;
+
+    console.log(
+      "useRef value:",
+      clickCountRef.current
+    );
+  };
+
+  const resetRef = () => {
+    clickCountRef.current = 0;
+
+    console.log(
+      "useRef reset:",
+      clickCountRef.current
+    );
+  };
+
+  // 2. ACCESS AN INPUT
   const inputRef =
     useRef<HTMLInputElement>(null);
-
-  const renderCount =
-    useRef<number>(0);
-
-  const [name, setName] =
-    useState<string>("");
-
-  renderCount.current += 1;
 
   const focusInput = () => {
     inputRef.current?.focus();
   };
 
   const clearInput = () => {
-    setName("");
-
-    inputRef.current?.focus();
+    if (inputRef.current) {
+      inputRef.current.value = "";
+      inputRef.current.focus();
+    }
   };
+
+  // 3. PREVIOUS VALUE
+  const [currentName, setCurrentName] =
+    useState<string>("Shenu");
+
+  const previousNameRef =
+    useRef<string>("");
+
+  useEffect(() => {
+    previousNameRef.current = currentName;
+  }, [currentName]);
 
   return (
     <div
@@ -32,84 +59,100 @@ function UseRefPage() {
         margin: "0 auto",
         padding: "30px",
         fontFamily: "Arial, sans-serif",
+        lineHeight: "1.5",
       }}
     >
-      <h1>React useRef Examples</h1>
+      <h1>useRef Examples</h1>
+
+      {/* 1. REMEMBER A VALUE */}
+      <section>
+        <h2>1. useRef — Remember a Value</h2>
+
+        <button onClick={handleRefClick}>
+          Change Ref Value
+        </button>
+
+        <button onClick={resetRef}>
+          Reset Ref
+        </button>
+
+        <p>
+          Check the browser console to see the
+          ref value.
+        </p>
+      </section>
 
       <hr />
 
+      {/* 2. ACCESS AN INPUT */}
       <section>
-        <h2>
-          1. Accessing an Input
-        </h2>
+        <h2>2. useRef — Access an Input</h2>
 
         <input
           ref={inputRef}
-          value={name}
-          onChange={(event) =>
-            setName(event.target.value)
-          }
-          placeholder="Enter your name"
+          placeholder="Type something..."
         />
-
-        <br />
-        <br />
 
         <button onClick={focusInput}>
           Focus Input
         </button>
 
         <button onClick={clearInput}>
-          Clear
+          Clear Input
         </button>
-
-        <p>
-          Value:{" "}
-          <strong>{name}</strong>
-        </p>
       </section>
 
       <hr />
 
+      {/* 3. PREVIOUS VALUE */}
       <section>
-        <h2>
-          2. Storing a Value with useRef
-        </h2>
+        <h2>3. useRef — Previous Value</h2>
 
         <p>
-          Render count:{" "}
+          Current name:{" "}
+          <strong>{currentName}</strong>
+        </p>
+
+        <p>
+          Previous name:{" "}
           <strong>
-            {renderCount.current}
+            {previousNameRef.current ||
+              "None yet"}
           </strong>
         </p>
 
-        <p>
-          The ref value can change
-          without directly causing
-          a re-render.
-        </p>
-      </section>
+        <button
+          onClick={() => setCurrentName("Shenu")}
+        >
+          Shenu
+        </button>
 
-      <hr />
+        <button
+          onClick={() => setCurrentName("Anna")}
+        >
+          Anna
+        </button>
 
-      <section>
-        <h2>
-          3. useState vs useRef
-        </h2>
+        <button
+          onClick={() => setCurrentName("John")}
+        >
+          John
+        </button>
 
-        <p>
-          The input value uses
-          <strong> useState </strong>
-          because it needs to update
-          the UI.
-        </p>
+        <button
+          onClick={() => setCurrentName("David")}
+        >
+          David
+        </button>
 
-        <p>
-          The input element reference
-          uses
-          <strong> useRef </strong>
-          to access the DOM element.
-        </p>
+        <button
+          onClick={() => {
+            setCurrentName("Shenu");
+            previousNameRef.current = "";
+          }}
+        >
+          Reset
+        </button>
       </section>
     </div>
   );
