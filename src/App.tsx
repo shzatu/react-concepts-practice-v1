@@ -5,6 +5,7 @@ import {
   Routes,
 } from "react-router-dom";
 
+import CheckoutPage from "./pages/CheckoutPage";
 import UseStatePage from "./pages/UseStatePage";
 import UseEffectPage from "./pages/UseEffectPage";
 import UseRefPage from "./pages/UseRefPage";
@@ -16,14 +17,17 @@ function App() {
       <nav
         style={{
           padding: "15px 30px",
-          borderBottom:
-            "1px solid #ddd",
+          borderBottom: "1px solid #ddd",
           display: "flex",
           gap: "20px",
           flexWrap: "wrap",
         }}
       >
         <Link to="/">
+          Checkout
+        </Link>
+
+        <Link to="/usestate">
           useState
         </Link>
 
@@ -43,6 +47,11 @@ function App() {
       <Routes>
         <Route
           path="/"
+          element={<CheckoutPage />}
+        />
+
+        <Route
+          path="/usestate"
           element={<UseStatePage />}
         />
 
