@@ -1,272 +1,213 @@
-import { useState } from "react";
+import { useRef } from "react";
 
 type CustomerInfo = {
-  firstName: string;
-  lastName: string;
+  ownerName: string;
   email: string;
-  phone: string;
+  phone1: string;
   address: string;
   city: string;
-  country: string;
+  state: string;
   postalCode: string;
+  country: string;
 };
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
+type CheckoutProps = {
+  customer: CustomerInfo;
+  setCustomer: React.Dispatch<
+    React.SetStateAction<CustomerInfo>
+  >;
+  onNext: () => void;
 };
 
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: "React T-Shirt",
-    price: 25,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    name: "TypeScript Mug",
-    price: 15,
-    quantity: 2,
-  },
-];
-
-const initialCustomer: CustomerInfo = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  address: "",
-  city: "",
-  country: "",
-  postalCode: "",
-};
-
-function Checkout() {
-  const [step, setStep] = useState<number>(1);
-
-  const [customer, setCustomer] =
-    useState<CustomerInfo>(initialCustomer);
-
-  const [orderPlaced, setOrderPlaced] =
-    useState<boolean>(false);
-
-  const shipping = 5;
-
-  const subtotal = mockProducts.reduce(
-    (total, product) =>
-      total + product.price * product.quantity,
-    0
-  );
-
-  const tax = subtotal * 0.1;
-
-  const total = subtotal + shipping + tax;
+function Checkout({
+  customer,
+  setCustomer,
+  onNext,
+}: CheckoutProps) {
+  const nameInputRef =
+    useRef<HTMLInputElement>(null);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = event.target;
 
-    setCustomer({
-      ...customer,
+    setCustomer((previousCustomer) => ({
+      ...previousCustomer,
       [name]: value,
-    });
+    }));
   };
 
-  const goToReview = () => {
-    setStep(2);
-  };
-
-  const goBackToDetails = () => {
-    setStep(1);
-  };
-
-  const placeOrder = () => {
-    setOrderPlaced(true);
-    setStep(3);
-  };
-
-  if (orderPlaced) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h1>Order Placed Successfully!</h1>
-
-          <p>
-            Thank you, {customer.firstName}.
-          </p>
-
-          <p>
-            Your order has been successfully placed.
-          </p>
-
-          <h2>Order #ORD-1001</h2>
-
-          <button
-            onClick={() => {
-              setOrderPlaced(false);
-              setStep(1);
-              setCustomer(initialCustomer);
-            }}
-          >
-            Start New Order
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const isCustomerComplete =
+    customer.ownerName &&
+    customer.email &&
+    customer.phone1 &&
+    customer.address &&
+    customer.city &&
+    customer.state &&
+    customer.postalCode &&
+    customer.country;
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1>Checkout</h1>
+        <div style={styles.header}>
+          <div>
+            <h1 style={styles.title}>
+              Checkout
+            </h1>
 
-        <p>
-          Step {step} of 2
-        </p>
+            <p style={styles.subtitle}>
+              Enter your customer details
+              and shipping information
+            </p>
+          </div>
 
-        {step === 1 && (
-          <section>
-            <h2>Customer & Shipping Details</h2>
+          <div style={styles.stepBadge}>
+            Step 1
+          </div>
+        </div>
 
-            <input
-              name="firstName"
-              placeholder="First Name"
-              value={customer.firstName}
-              onChange={handleChange}
-            />
+        <div style={styles.stepLine}>
+          <div style={styles.activeStep}>
+            1. Customer Details
+          </div>
 
-            <input
-              name="lastName"
-              placeholder="Last Name"
-              value={customer.lastName}
-              onChange={handleChange}
-            />
+          <div style={styles.inactiveStep}>
+            2. Products
+          </div>
 
-            <input
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={customer.email}
-              onChange={handleChange}
-            />
+          <div style={styles.inactiveStep}>
+            3. Cart
+          </div>
 
-            <input
-              name="phone"
-              placeholder="Phone"
-              value={customer.phone}
-              onChange={handleChange}
-            />
+          <div style={styles.inactiveStep}>
+            4. Summary
+          </div>
+        </div>
+
+        <section style={styles.section}>
+          <h2>Customer Details</h2>
+
+          <div style={styles.formGrid}>
+            <div style={styles.field}>
+              <label>Full Name</label>
+
+              <input
+                ref={nameInputRef}
+                name="ownerName"
+                value={customer.ownerName}
+                onChange={handleChange}
+                placeholder="Enter full name"
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.field}>
+              <label>Email Address</label>
+
+              <input
+                name="email"
+                type="email"
+                value={customer.email}
+                onChange={handleChange}
+                placeholder="Enter email address"
+                style={styles.input}
+              />
+            </div>
+
+            <div style={styles.field}>
+              <label>Phone Number</label>
+
+              <input
+                name="phone1"
+                value={customer.phone1}
+                onChange={handleChange}
+                placeholder="Enter phone number"
+                style={styles.input}
+              />
+            </div>
+          </div>
+        </section>
+
+        <section style={styles.section}>
+          <h2>Shipping Address</h2>
+
+          <div style={styles.field}>
+            <label>Address</label>
 
             <input
               name="address"
-              placeholder="Address"
               value={customer.address}
               onChange={handleChange}
+              placeholder="Street address"
+              style={styles.input}
             />
+          </div>
 
-            <input
-              name="city"
-              placeholder="City"
-              value={customer.city}
-              onChange={handleChange}
-            />
+          <div style={styles.formGrid}>
+            <div style={styles.field}>
+              <label>City</label>
 
-            <input
-              name="country"
-              placeholder="Country"
-              value={customer.country}
-              onChange={handleChange}
-            />
+              <input
+                name="city"
+                value={customer.city}
+                onChange={handleChange}
+                placeholder="City"
+                style={styles.input}
+              />
+            </div>
 
-            <input
-              name="postalCode"
-              placeholder="Postal Code"
-              value={customer.postalCode}
-              onChange={handleChange}
-            />
+            <div style={styles.field}>
+              <label>Province</label>
 
-            <button onClick={goToReview}>
-              Next
-            </button>
-          </section>
-        )}
+              <input
+                name="state"
+                value={customer.state}
+                onChange={handleChange}
+                placeholder="Province"
+                style={styles.input}
+              />
+            </div>
 
-        {step === 2 && (
-          <section>
-            <h2>Review Order</h2>
+            <div style={styles.field}>
+              <label>Postal Code</label>
 
-            <h3>Customer Details</h3>
+              <input
+                name="postalCode"
+                value={customer.postalCode}
+                onChange={handleChange}
+                placeholder="Postal Code"
+                style={styles.input}
+              />
+            </div>
 
-            <p>
-              Name: {customer.firstName}{" "}
-              {customer.lastName}
-            </p>
+            <div style={styles.field}>
+              <label>Country</label>
 
-            <p>
-              Email: {customer.email}
-            </p>
+              <input
+                name="country"
+                value={customer.country}
+                onChange={handleChange}
+                placeholder="Country"
+                style={styles.input}
+              />
+            </div>
+          </div>
+        </section>
 
-            <p>
-              Phone: {customer.phone}
-            </p>
-
-            <p>
-              Address: {customer.address},{" "}
-              {customer.city},{" "}
-              {customer.country}
-            </p>
-
-            <h3>Items</h3>
-
-            {mockProducts.map((product) => (
-              <div key={product.id}>
-                <p>
-                  {product.name} × {product.quantity}
-                  {" — "}
-                  $
-                  {(
-                    product.price *
-                    product.quantity
-                  ).toFixed(2)}
-                </p>
-              </div>
-            ))}
-
-            <hr />
-
-            <p>
-              Subtotal: $
-              {subtotal.toFixed(2)}
-            </p>
-
-            <p>
-              Shipping: $
-              {shipping.toFixed(2)}
-            </p>
-
-            <p>
-              Tax: $
-              {tax.toFixed(2)}
-            </p>
-
-            <h2>
-              Total: $
-              {total.toFixed(2)}
-            </h2>
-
-            <button onClick={goBackToDetails}>
-              Back
-            </button>
-
-            <button onClick={placeOrder}>
-              Place Order
-            </button>
-          </section>
-        )}
+        <button
+          onClick={onNext}
+          disabled={!isCustomerComplete}
+          style={{
+            ...styles.primaryButton,
+            opacity: isCustomerComplete
+              ? 1
+              : 0.5,
+          }}
+        >
+          Continue to Products →
+        </button>
       </div>
     </div>
   );
@@ -274,24 +215,108 @@ function Checkout() {
 
 const styles = {
   container: {
-    maxWidth: "700px",
-    margin: "0 auto",
-    padding: "30px",
+    width: "100%",
+    minHeight: "100vh",
+    padding: "40px 20px",
+    boxSizing: "border-box" as const,
     fontFamily: "Arial, sans-serif",
+    background: "#f7f7f7",
   },
 
   card: {
+    maxWidth: "1200px",
+    margin: "0 auto",
+    background: "#fff",
     border: "1px solid #ddd",
-    borderRadius: "12px",
-    padding: "30px",
+    borderRadius: "14px",
+    padding: "35px",
+    boxSizing: "border-box" as const,
+  },
+
+  header: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "20px",
+  },
+
+  title: {
+    marginBottom: "5px",
+  },
+
+  subtitle: {
+    marginTop: "0",
+    color: "#666",
+  },
+
+  stepBadge: {
+    border: "1px solid #ccc",
+    borderRadius: "20px",
+    padding: "8px 15px",
+    whiteSpace: "nowrap" as const,
+  },
+
+  stepLine: {
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(4, 1fr)",
+    margin: "30px 0",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    overflow: "hidden" as const,
+  },
+
+  activeStep: {
+    padding: "14px",
+    textAlign: "center" as const,
+    fontWeight: "bold",
+    borderRight: "1px solid #ddd",
+  },
+
+  inactiveStep: {
+    padding: "14px",
+    textAlign: "center" as const,
+    color: "#888",
+    borderRight: "1px solid #ddd",
+  },
+
+  section: {
+    border: "1px solid #ddd",
+    borderRadius: "10px",
+    padding: "25px",
+    marginBottom: "25px",
+  },
+
+  formGrid: {
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(2, minmax(0, 1fr))",
+    gap: "18px",
+  },
+
+  field: {
+    marginBottom: "15px",
   },
 
   input: {
     display: "block",
     width: "100%",
-    padding: "10px",
-    marginBottom: "12px",
     boxSizing: "border-box" as const,
+    padding: "12px",
+    marginTop: "7px",
+    border: "1px solid #ccc",
+    borderRadius: "6px",
+    fontSize: "15px",
+  },
+
+  primaryButton: {
+    width: "100%",
+    padding: "14px",
+    border: "none",
+    borderRadius: "7px",
+    cursor: "pointer",
+    fontSize: "16px",
+    fontWeight: "bold",
   },
 };
 

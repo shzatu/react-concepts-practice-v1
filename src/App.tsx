@@ -21,6 +21,8 @@ function App() {
           display: "flex",
           gap: "20px",
           flexWrap: "wrap",
+          fontFamily: "Arial, sans-serif",
+          background: "#fff",
         }}
       >
         <Link to="/">
